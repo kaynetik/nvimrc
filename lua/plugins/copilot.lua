@@ -2,27 +2,44 @@ local M = {
   'zbirenbaum/copilot.lua',
   cmd = 'Copilot',
   build = ':Copilot auth',
+  event = 'VeryLazy',
 }
 
 M.opts = {
-  suggestion = {
-    enabled = true,
-    auto_trigger = true,
+  panel = {
+    title = 'Copilot',
+    enabled = false,
+    auto_refresh = false,
+    keymap = {
+      jump_prev = '[[',
+      jump_next = ']]',
+      accept = '<CR>',
+      refresh = 'gr',
+      open = '<M-CR>',
+    },
+    layout = {
+      position = 'bottom', -- | top | left | right
+      ratio = 0.4,
+    },
   },
-  panel = { enabled = false },
+
+  suggestion = {
+    enabled = false,
+    auto_trigger = true,
+    debounce = 75,
+    keymap = {
+      accept = '<leader>la',
+      accept_word = false,
+      accept_line = false,
+      next = '<leader>l]',
+      prev = '<leader>l[>',
+      dismiss = false,
+    },
+  },
 }
 
--- Keymap to accept a suggestion
-local function set_keymaps()
-  local opts = { noremap = true, silent = true }
-  -- This maps Ctrl-Shift-y to accept the current suggestion
-  vim.api.nvim_set_keymap('i', '<C-S-y>', 'copilot#Accept("<CR>")', opts)
+M.config = function()
+  require('copilot').setup(M.opts)
 end
-
--- Ensure the keymaps are set after Copilot is loaded
-vim.api.nvim_create_autocmd('User', {
-  pattern = 'CopilotReady',
-  callback = set_keymaps,
-})
 
 return M
